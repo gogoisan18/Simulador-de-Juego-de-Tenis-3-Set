@@ -1,0 +1,545 @@
+<html>
+    <head>
+        <title>Juego de Tenis</title>
+        <link rel="stylesheet" href="main.css" type="text/css" />
+        <script type="text/javascript" src="../../Winwheel.js"></script>
+        <script type="text/javascript" src="../../TweenMax.min.js"></script>
+        <script type="text/javascript" src="../../sweetalert2.all.min.js"></script>
+        <!--<script type="text/javascript" src="../../jquery.min"></script>-->
+    </head>
+    <body>
+
+<table align="center" border="5" width="750" height="482" >  
+           
+        <tr>
+            <td>
+                <div align="left">
+                    <h1>Simulador de Juego de Tenis 3 Set</h1>
+                    <br />
+                    <table cellpadding="0" cellspacing="0" border="0">
+                        <tr>
+                            <td>
+                                <div class="power_controls">
+                                    <br />
+                                    <br />
+                                    <table class="power" cellpadding="10" cellspacing="0">
+                                        <tr>
+                                            <th align="center"> Velocidad</th>
+                                        </tr>
+                                         <tr>
+                                            <td align="center" id="pw1" onClick="powerSelected(1);">Lento</td>
+                                        </tr>
+                                        <tr>
+                                            <td width="78" align="center" id="pw3" value="1" onClick="powerSelected(3);">Jugador 1</td>
+                                        </tr>
+                                        <tr>
+                                            <td align="center" id="pw2" value="2" onClick="powerSelected(2);">Jugador 2</td>
+                                        </tr>
+                                       
+                                    </table>
+                                    <br />
+                                    <img id="spin_button" src="spin_off.png" alt="Spin" onClick="startSpin();" />
+                                    <br /><br />
+                                    &nbsp;&nbsp;<a href="#" onClick="resetWheel(); return false;">Limpiar</a>
+                                </div>
+                            </td>
+                            <td width="338" height="482" class="the_wheel" align="center" valign="center">
+                                <canvas id="canvas" width="434" height="434">
+                                    <p style="{color: white}" align="center">
+        Lo sentimos, su navegador no es compatible con canvas. Por favor, intente con otro.</p>
+                                </canvas>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </td>
+                  <td><img src="cancha.png"  alt="Cancha" width="250" height="200" /> </td>
+            <td> 
+                <table align="center" width="300" height="200" id="resultados" >
+                    <thead>
+                        <tr>
+                            <th colspan="4">Resultados</th>
+                            
+                        </tr>
+                                    <tr>
+                            <th></th>
+                            <th>Set 1</th>
+                            <th>Set 2</th>
+                            <th>Set 3</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="jugador1" >Jugador 1</td>
+                            <td id="1x"> </td>
+                            <td id="2x"> </td>
+                            <td id="3x"> </td>
+                        </tr>
+                        <tr>
+                            <td class="jugador2" >Jugador 2</td>
+                            <td id="4x"> </td>
+                            <td id="5x"> </td>
+                            <td id="6x"> </td>
+                        </tr>
+                     
+                    </tbody>
+                </table>
+                            </td>
+            
+        </tr>
+     
+    </tbody>
+</table>
+
+
+ <style>
+    * {
+      transition: all 0.3s;
+    }
+
+   .fondo {
+      width: 70%;
+      height: 42%;
+      background: cadetblue;
+      padding: 20;
+      margin: 160;
+      text-align: center;
+      font-family: calibri;
+      font-size: 100%;      
+      
+    }
+
+    .contenedor {
+      width: 38vw;
+      height: 30vh;
+      display: inline-flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .encabezado {
+      position: relative;
+      background: white;
+      min-width: 300px;
+      width: 70%;
+      max-width: 600px;
+      padding: 20px;
+    }
+
+    .categoria {
+      opacity: 0.3;
+      text-align: left;
+    }
+
+    .pregunta {
+      padding: 0px;
+    }
+
+    .imagen {
+      object-fit: cover;
+      height: 0px;
+      width: 0px;
+    }
+
+    .btn {
+      background: white;
+      width: 60%;
+      max-width: 550px;
+      padding: 10px;
+      margin: 5px;
+      cursor: pointer;
+    }
+
+    .btn:hover {
+      transform: scale(1.05);
+    }
+    
+    .numero{
+      position: absolute;
+      opacity:0.3;
+      top: 10px;
+      right: 10px;
+    }
+    
+    .puntaje{
+      padding:10px;
+      color:white;
+    }
+
+    .jugador1 { 
+      background: #ef6f6f;
+      width: 25%;
+    }
+
+    .jugador2 { 
+      background: #86ef6f;
+      width: 25%;
+    }
+
+    .hidden {display:none !important;}
+
+  </style>
+
+
+   <br />
+<table align="center" width="700" height="200" id="set1" border="5">
+        <thead>
+            <tr>
+                <th colspan="10">Set 1 Resultados</th>
+                
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="jugador1" >Jugador 1</td>
+                <td> <input name="1xS1"  id="1xS1" size="1" type="text"></td>
+                <td> <input name="2xS1"  id="2xS1" size="1" type="text"> </td>
+                <td> <input name="3xS1"  id="3xS1" size="1" type="text"></td>
+                <td> <input name="4xS1"  id="4xS1" size="1" type="text"></td>
+                <td> <input name="5xS1"  id="5xS1" size="1" type="text"> </td>
+                <td> <input name="6xS1"  id="6xS1" size="1" type="text"></td>
+                <td> <input name="7xS1"  id="7xS1" size="1" type="text"></td>
+                <td> <input name="8xS1"  id="8xS1" size="1" type="text"></td>
+                <td> <input name="9xS1"  id="9xS1" size="1" type="text"></td>
+            </tr>
+            <tr>
+                <td class="jugador2" >Jugador 2</td>
+                <td> <input name="1xS1x"  id="1xS1x" size="1" type="text"></td>
+                <td> <input name="2xS1x"  id="2xS1x" size="1" type="text"></td>
+                <td> <input name="3xS1x"  id="3xS1x" size="1" type="text"></td>
+                <td> <input name="4xS1x"  id="4xS1x" size="1" type="text"></td>
+                <td> <input name="5xS1x"  id="5xS1x" size="1" type="text"></td>
+                <td> <input name="6xS1x"  id="6xS1x" size="1" type="text"></td>
+                <td> <input name="7xS1x"  id="7xS1x" size="1" type="text"></td>
+                <td> <input name="8xS1x"  id="8xS1x" size="1" type="text"></td>
+                <td> <input name="9xS1x"  id="9xS1x" size="1" type="text"></td>
+            </tr>
+         
+        </tbody>
+</table>
+
+<div  id="juga">
+
+  <input type="text" name="idjug"  id="idjug" size="1" >
+  <input type="text" name="falta"  id="falta" size="1" >
+
+</div>
+<!--
+<table align="center" width="700" height="200" id="set2" class="hidden5" border="5">
+        <thead>
+            <tr>
+                <th colspan="10">Set 2 Resultados</th>
+                
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="jugador1" >Jugador 1</td>
+                <td id="1xS2"> </td>
+                <td id="2xS2"> </td>
+                <td id="3xS2"> </td>
+                <td id="4xS2"> </td>
+                <td id="5xS2"> </td>
+                <td id="6xS2"> </td>
+                <td id="7xS2"> </td>
+                <td id="8xS2"> </td>
+                <td id="9xS2"> </td>
+            </tr>
+            <tr>
+                <td class="jugador2" >Jugador 2</td>
+                <td id="1xS2x"> </td>
+                <td id="2xS2x"> </td>
+                <td id="3xS2x"> </td>
+                <td id="4xS2x"> </td>
+                <td id="5xS2x"> </td>
+                <td id="6xS2x"> </td>
+                <td id="7xS2x"> </td>
+                <td id="8xS2x"> </td>
+                <td id="9xS2x"> </td>
+            </tr>
+         
+        </tbody>
+</table>
+
+<table align="center" width="700" height="200" id="set3" class="hidden5" border="5">
+        <thead>
+            <tr>
+                <th colspan="10">Set 3 Resultados</th>
+                
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="jugador1" >Jugador 1</td>
+                <td id="1xS3"> </td>
+                <td id="2xS3"> </td>
+                <td id="3xS3"> </td>
+                <td id="4xS3"> </td>
+                <td id="5xS3"> </td>
+                <td id="6xS3"> </td>
+                <td id="7xS3"> </td>
+                <td id="8xS3"> </td>
+                <td id="9xS3"> </td>
+            </tr>
+            <tr>
+                <td class="jugador2" >Jugador 2</td>
+                <td id="1xS3x"> </td>
+                <td id="2xS3x"> </td>
+                <td id="3xS3x"> </td>
+                <td id="4xS3x"> </td>
+                <td id="5xS3x"> </td>
+                <td id="6xS3x"> </td>
+                <td id="7xS3x"> </td>
+                <td id="8xS3x"> </td>
+                <td id="9xS3x"> </td>
+            </tr>
+         
+        </tbody>
+</table>-->
+
+<br />
+ <div class="fondo hidden" id="ocultar">
+     <div class="contenedor" >
+        <div class="puntaje" id="puntaje"></div>
+        <div class="encabezado">
+          <div class="categoria" id="categoria">
+          </div>
+          <div class="numero" id="numero"></div>
+          <div class="pregunta" id="pregunta">
+          </div>
+          <img src="#" class="imagen" id="imagen">
+        </div>
+        <div class="btn" id="btn1" onclick="oprimir_btn(0)"></div>
+        <div class="btn" id="btn2" onclick="oprimir_btn(1)"></div>
+        <div class="btn" id="btn3" onclick="oprimir_btn(2)"></div>
+        <div class="btn" id="btn4" onclick="oprimir_btn(3)"></div>
+        
+        <script src="index.js"></script>
+      </div>
+</div>
+
+
+    <script type="text/javascript">
+
+   /* $(document).on(function() { 
+        $("#ocultar").addClass('hidden');          
+           
+    });*/
+
+         var theWheel = new Winwheel({
+                'numSegments'  : 3,     // Specify number of segments.
+                'outerRadius'  : 212,   // Set outer radius so wheel fits inside the background.
+                'textFontSize' : 23,    // Set font size as desired.
+                'segments'     :        // Define segments including colour and text.
+                [
+                   {'fillStyle' : '#eae56f', 'text' : 'Gano el Punto'},
+                   {'fillStyle' : '#89f26e', 'text' : 'Perdio el Punto'},
+                   {'fillStyle' : '#e7706f', 'text' : 'Hizo Falta'}
+                ],
+                'animation' :           // Specify the animation to use.
+                {
+                    'type'     : 'spinToStop',
+                    'duration' : 5,     // Duration in seconds.
+                    'spins'    : 8,     // Number of complete spins.
+                    'callbackFinished' : alertPrize
+                }
+            });
+
+            // Vars used by the code in this page to do power controls.
+            var wheelPower    = 0;
+            var wheelSpinning = false;
+
+
+            // -------------------------------------------------------
+            // Function to handle the onClick on the power buttons.
+            // -------------------------------------------------------
+            function powerSelected(powerLevel)
+            {
+                // Ensure that power can't be changed while wheel is spinning.
+                if (wheelSpinning == false)
+                {
+                    // Reset all to grey incase this is not the first time the user has selected the power.
+                    document.getElementById('pw1').className = "";
+                    document.getElementById('pw2').className = "";
+                    document.getElementById('pw3').className = "";
+
+                    // Now light up all cells below-and-including the one selected by changing the class.
+                    if (powerLevel >= 1)
+                    {
+                        document.getElementById('pw1').className = "pw1";
+                    }
+
+                    if (powerLevel >= 2)
+                    {
+                        document.getElementById('pw2').className = "pw2";
+                    }
+
+                    if (powerLevel >= 3)
+                    {
+                        document.getElementById('pw3').className = "pw3";
+                    }
+
+                    // Set wheelPower var used when spin button is clicked.
+                    wheelPower = powerLevel;
+
+                    // Light up the spin button by changing it's source image and adding a clickable class to it.
+                    document.getElementById('spin_button').src = "spin_on.png";
+                    document.getElementById('spin_button').className = "clickable";
+                }
+            }
+
+            // -------------------------------------------------------
+            // Click handler for spin button.
+            // -------------------------------------------------------
+            function startSpin()
+            {
+                // Ensure that spinning can't be clicked again while already running.
+                if (wheelSpinning == false)
+                {
+                    // Based on the power level selected adjust the number of spins for the wheel, the more times is has
+                    // to rotate with the duration of the animation the quicker the wheel spins.
+                    if (wheelPower == 1)
+                    {
+                        theWheel.animation.spins = 3;
+                    }
+                    else if (wheelPower == 2)
+                    {
+                        theWheel.animation.spins = 8;
+                    }
+                    else if (wheelPower == 3)
+                    {
+                        theWheel.animation.spins = 15;
+                    }
+
+                    // Disable the spin button so can't click again while wheel is spinning.
+                    document.getElementById('spin_button').src       = "spin_off.png";
+                    document.getElementById('spin_button').className = "";
+
+                    // Begin the spin animation by calling startAnimation on the wheel object.
+                    theWheel.startAnimation();
+
+                    // Set to true so that power can't be changed and spin button re-enabled during
+                    // the current animation. The user will have to reset before spinning again.
+                    wheelSpinning = true;
+                }
+            }
+
+            // -------------------------------------------------------
+            // Function for reset button.
+            // -------------------------------------------------------
+            function resetWheel()
+            {
+                theWheel.stopAnimation(false);  // Stop the animation, false as param so does not call callback function.
+                theWheel.rotationAngle = 0;     // Re-set the wheel angle to 0 degrees.
+                theWheel.draw();                // Call draw to render changes to the wheel.
+
+                document.getElementById('pw1').className = "";  // Remove all colours from the power level indicators.
+                document.getElementById('pw2').className = "";
+                document.getElementById('pw3').className = "";
+
+                wheelSpinning = false;          // Reset to false to power buttons and spin can be clicked again.
+                var element = document.getElementById("ocultar");
+                    element.classList.add("hidden");
+            }
+
+            const boton = document.querySelector("#pw3");
+
+            const boton1 = document.querySelector("#pw2");
+
+
+                boton.addEventListener("click", function(evento){
+                    // Aquí todo el código que se ejecuta cuando se da click al botón
+                    //alert("Le has dado click al jugador 1");
+                   document.getElementById('idjug').value = 1; 
+                });
+
+           
+             
+                boton1.addEventListener("click", function(evento){
+                    // Aquí todo el código que se ejecuta cuando se da click al botón
+                    //alert("Le has dado click al jugador 2");
+                     document.getElementById('idjug').value = 2; 
+                });
+             
+               
+            // -------------------------------------------------------
+            // Called when the spin animation has finished by the callback feature of the wheel because I specified callback in the parameters
+            // note the indicated segment is passed in as a parmeter as 99% of the time you will want to know this to inform the user of their prize.
+            // -------------------------------------------------------
+            function alertPrize(indicatedSegment)
+            {
+               
+
+                if(indicatedSegment.text=='Gano el Punto'){
+                    alert("Para terminar de ganar el punto proceda a responder la pregunta aleatorio, en la parte inferior");
+
+                    var element = document.getElementById("ocultar");
+                    element.classList.remove("hidden");
+
+                }else if(indicatedSegment.text=='Perdio el Punto'){
+
+                   alert("Resultado1: " + indicatedSegment.text);
+
+                if(document.getElementById('idjug').value==1){
+
+                     if(document.getElementById('1xS1').value==''){
+                         document.getElementById('1xS1').value = 0; 
+                     }else  if(document.getElementById('1xS1').value!='' && document.getElementById('2xS1').value==''){
+                        document.getElementById('2xS1').value = 0; 
+                     }else  if(document.getElementById('2xS1').value!='' && document.getElementById('3xS1').value==''){
+                        document.getElementById('3xS1').value = 0; 
+                     }else  if(document.getElementById('3xS1').value!='' && document.getElementById('4xS1').value==''){
+                        document.getElementById('4xS1').value = 0; 
+                     }else  if(document.getElementById('4xS1').value!='' && document.getElementById('5xS1').value==''){
+                        document.getElementById('5xS1').value = 0; 
+                     }else  if(document.getElementById('5xS1').value!='' && document.getElementById('6xS1').value==''){
+                        document.getElementById('6xS1').value = 0; 
+                     }else  if(document.getElementById('6xS1').value!='' && document.getElementById('7xS1').value==''){
+                        document.getElementById('7xS1').value = 0; 
+                     }else  if(document.getElementById('7xS1').value!='' && document.getElementById('8xS1').value==''){
+                        document.getElementById('8xS1').value = 0; 
+                     }else  if(document.getElementById('8xS1').value!='' && document.getElementById('9xS1').value==''){
+                        document.getElementById('9xS1').value = 0; 
+                     }                         
+
+                }else{
+                    if(document.getElementById('1xS1x').value==''){
+                         document.getElementById('1xS1x').value = 0; 
+                     }else  if(document.getElementById('1xS1x').value!='' && document.getElementById('2xS1x').value==''){
+                        document.getElementById('2xS1x').value = 0; 
+                     }else  if(document.getElementById('2xS1x').value!='' && document.getElementById('3xS1x').value==''){
+                        document.getElementById('3xS1x').value = 0; 
+                     }else  if(document.getElementById('3xS1x').value!='' && document.getElementById('4xS1x').value==''){
+                        document.getElementById('4xS1x').value = 0; 
+                     }else  if(document.getElementById('4xS1x').value!='' && document.getElementById('5xS1x').value==''){
+                        document.getElementById('5xS1x').value = 0; 
+                     }else  if(document.getElementById('5xS1x').value!='' && document.getElementById('6xS1x').value==''){
+                        document.getElementById('6xS1x').value = 0; 
+                     }else  if(document.getElementById('6xS1x').value!='' && document.getElementById('7xS1x').value==''){
+                        document.getElementById('7xS1x').value = 0; 
+                     }else  if(document.getElementById('7xS1x').value!='' && document.getElementById('8xS1x').value==''){
+                        document.getElementById('8xS1x').value = 0; 
+                     }else  if(document.getElementById('8xS1x').value!='' && document.getElementById('9xS1x').value==''){
+                        document.getElementById('9xS1x').value = 0; 
+                     } 
+
+
+                }
+
+                }else{
+                    alert("Resultado2: " + indicatedSegment.text);
+
+                }
+
+                 //$("#ocultar").removeClass('hidden');
+
+
+            }
+
+
+        </script>
+
+
+    </body>
+</html>

@@ -1,0 +1,723 @@
+let preguntas_aleatorias = true;
+let mostrar_pantalla_juego_terminado = true;
+let reiniciar_puntos_al_reiniciar_el_juego = true;
+
+window.onload = function () {
+  base_preguntas = readText("base-preguntas.json");
+  interprete_bp = base_preguntas;
+  //console.log(base_preguntas);
+  //interprete_bp = JSON.parse(base_preguntas);
+  escogerPreguntaAleatoria();
+};
+
+let pregunta;
+let posibles_respuestas;
+btn_correspondiente = [
+  select_id("btn1"),
+  select_id("btn2"),
+  select_id("btn3"),
+  select_id("btn4")
+];
+let npreguntas = [];
+
+let preguntas_hechas = 0;
+let preguntas_correctas = 0;
+
+function escogerPreguntaAleatoria() {
+  let n;
+  if (preguntas_aleatorias) {
+    n = Math.floor(Math.random() * interprete_bp.length);
+  } else {
+    n = 0;
+  }
+
+  while (npreguntas.includes(n)) {
+    n++;
+    if (n >= interprete_bp.length) {
+      n = 0;
+    }
+    if (npreguntas.length == interprete_bp.length) {
+      //Aquí es donde el juego se reinicia
+      if (mostrar_pantalla_juego_terminado) {
+        swal.fire({
+          title: "Juego finalizado",
+          text:
+            "Puntuación: " + preguntas_correctas + "/" + (preguntas_hechas - 1),
+          icon: "success"
+        });
+      }
+      if (reiniciar_puntos_al_reiniciar_el_juego) {
+        preguntas_correctas = 0
+        preguntas_hechas = 0
+      }
+      npreguntas = [];
+    }
+  }
+  npreguntas.push(n);
+  preguntas_hechas++;
+
+  escogerPregunta(n);
+}
+
+function escogerPregunta(n) {
+  pregunta = interprete_bp[n];
+  select_id("categoria").innerHTML = pregunta.categoria;
+  select_id("pregunta").innerHTML = pregunta.pregunta;
+  select_id("numero").innerHTML = n;
+  let pc = preguntas_correctas;
+  if (preguntas_hechas > 1) {
+    select_id("puntaje").innerHTML = pc + "/" + (preguntas_hechas - 1);
+  } else {
+    select_id("puntaje").innerHTML = "";
+  }
+
+  style("imagen").objectFit = pregunta.objectFit;
+  desordenarRespuestas(pregunta);
+  if (pregunta.imagen) {
+    select_id("imagen").setAttribute("src", pregunta.imagen);
+    style("imagen").height = "200px";
+    style("imagen").width = "100%";
+  } else {
+    style("imagen").height = "0px";
+    style("imagen").width = "0px";
+    setTimeout(() => {
+      select_id("imagen").setAttribute("src", "");
+    }, 500);
+  }
+}
+
+function desordenarRespuestas(pregunta) {
+  posibles_respuestas = [
+    pregunta.respuesta,
+    pregunta.incorrecta1,
+    pregunta.incorrecta2,
+    pregunta.incorrecta3,
+  ];
+  posibles_respuestas.sort(() => Math.random() - 0.5);
+
+  select_id("btn1").innerHTML = posibles_respuestas[0];
+  select_id("btn2").innerHTML = posibles_respuestas[1];
+  select_id("btn3").innerHTML = posibles_respuestas[2];
+  select_id("btn4").innerHTML = posibles_respuestas[3];
+}
+
+let suspender_botones = false;
+
+function oprimir_btn(i) {
+  if (suspender_botones) {
+    return;
+  }
+  suspender_botones = true;
+  if (posibles_respuestas[i] == pregunta.respuesta) {
+    preguntas_correctas++;
+    btn_correspondiente[i].style.background = "lightgreen";
+     document.getElementById('2xS1').value = 15;  
+  } else {
+    btn_correspondiente[i].style.background = "pink";
+  }
+  for (let j = 0; j < 4; j++) {
+    if (posibles_respuestas[j] == pregunta.respuesta) {
+      btn_correspondiente[j].style.background = "lightgreen";
+      break;
+    }
+  }
+  setTimeout(() => {
+    reiniciar();
+    suspender_botones = false;
+  }, 3000);
+}
+
+// let p = prompt("numero")
+
+function reiniciar() {
+  for (const btn of btn_correspondiente) {
+    btn.style.background = "white";
+  }
+  escogerPreguntaAleatoria();
+}
+
+function select_id(id) {
+  return document.getElementById(id);
+}
+
+function style(id) {
+  return select_id(id).style;
+}
+
+function readText(ruta_local) {
+  var texto = null;
+
+texto = 
+[
+   
+    {
+        "categoria": "Matemática",
+        "pregunta": "Periodo de vida de J. Kepler",
+        "respuesta": "(1571 - 1630)",
+        "incorrecta1": "(1672 - 1720)",
+        "incorrecta2": "(1420 - 1507)",
+        "incorrecta3": "Sigue con vida\r"
+    },
+    {
+        "categoria": "Matemática",
+        "pregunta": "Famoso por una manzana que cayó en su cabeza",
+        "respuesta": "I Newton",
+        "incorrecta1": "G Leibniz",
+        "incorrecta2": "L'Hopital",
+        "incorrecta3": "M Agnesi\r"
+    },
+    {
+        "categoria": "Matemática",
+        "pregunta": "¿En qué año Newton Descubrió el calculo?",
+        "respuesta": "1665",
+        "incorrecta1": "1637",
+        "incorrecta2": "1728",
+        "incorrecta3": "1696\r"
+    },
+    {
+        "categoria": "Matemática",
+        "pregunta": "¿Qué descubrio Kepler en 1609?",
+        "respuesta": "Las leyes del movimiento planetario",
+        "incorrecta1": "La geometria analitica",
+        "incorrecta2": "La integral de Kepler",
+        "incorrecta3": "El volumen del cilindro\r"
+    },
+    {
+        "categoria": "Matemática",
+        "pregunta": "Que numero introdujo Euler",
+        "respuesta": "2,71828182845904523536028747135266249775…",
+        "incorrecta1": "1,41421356237309504880168872420969807856…",
+        "incorrecta2": "0",
+        "incorrecta3": "1.73205080756887729352744634150587236694…\r"
+    },
+    {
+        "categoria": "Matemática",
+        "pregunta": "Este es el antiguo billete de 10 francos suizos ¿De quién es el retrato?",
+        "respuesta": "Euler",
+        "incorrecta1": "Bacón",
+        "incorrecta2": "Rieman",
+        "incorrecta3": "Fibonacci\r"
+    },
+    {
+        "categoria": "Matemática",
+        "pregunta": "Area del triangulo",
+        "respuesta": "½ab(senΘ)",
+        "incorrecta1": "2πr",
+        "incorrecta2": "πr²",
+        "incorrecta3": "bh\r"
+    },
+    {
+        "categoria": "Matemática",
+        "pregunta": "Area del triangulo",
+        "respuesta": "½bh",
+        "incorrecta1": "2πr",
+        "incorrecta2": "πr²",
+        "incorrecta3": "bh\r"
+    },
+    {
+        "categoria": "Matemática",
+        "pregunta": "Area del paralelogramo",
+        "respuesta": "bh",
+        "incorrecta1": "½bh",
+        "incorrecta2": "½bh",
+        "incorrecta3": "½ab(senΘ)\r"
+    },
+    {
+        "categoria": "Matemática",
+        "pregunta": "Circunferencia de un circulo",
+        "respuesta": "2πr",
+        "incorrecta1": "½bh",
+        "incorrecta2": "½bh",
+        "incorrecta3": "½ab(senΘ)\r"
+    },
+    {
+        "categoria": "Matemática",
+        "pregunta": "Area de un circulo",
+        "respuesta": "πr²",
+        "incorrecta1": "½bh",
+        "incorrecta2": "½bh",
+        "incorrecta3": "½ab(senΘ)\r"
+    },
+    {
+        "categoria": "Matemática",
+        "pregunta": "¿Qué es el radio?",
+        "respuesta": "es un segmento que une el centro con un punto de la circunferencia perimetral.",
+        "incorrecta1": "es un segmento que une dos puntos de la circunferencia sin pasar por su centro.",
+        "incorrecta2": "línea que hace parte y sobresale del círculo .",
+        "incorrecta3": "Es la recta que toca al círculo en un solo punto; es perpendicular al radio cuyo extremo es el punto de tangencia.\r"
+    },
+    {
+        "categoria": "Matemática",
+        "pregunta": "Perímetro del Círculo",
+        "respuesta": "2πr",
+        "incorrecta1": "πr²",
+        "incorrecta2": "π²",
+        "incorrecta3": "Ninguna es correcta\r"
+    },
+    {
+        "categoria": "Matemática",
+        "pregunta": "¿Cuánto vale el radio de la circunferencia goniométrica?",
+        "respuesta": "1",
+        "incorrecta1": "π²",
+        "incorrecta2": "3",
+        "incorrecta3": "cualquier numero real\r"
+    },
+    {
+        "categoria": "Matemática",
+        "pregunta": "¿Que es π, (número pi)?",
+        "respuesta": "Es el cociente entre la longitud de la circunferencia y el diámetro",
+        "incorrecta1": "Es la relacion entre el diametro y el radio",
+        "incorrecta2": "El producto del Area con el perimetro",
+        "incorrecta3": "La raiz del radio\r"
+    },
+    {
+        "categoria": "Matemática",
+        "pregunta": "Cuales son Paralelogramos rectángulos",
+        "respuesta": "El cuadrado y el rectangulo",
+        "incorrecta1": "El rombo y  el romboide",
+        "incorrecta2": "El triangulo equilatero y el triangulo isoseles",
+        "incorrecta3": "El cono y la esfera\r"
+    },
+    {
+        "categoria": "Matemática",
+        "pregunta": "Cuales son Paralelogramos no rectángulos",
+        "respuesta": "El rombo y  el romboide",
+        "incorrecta1": "El cuadrado y el rectangulo",
+        "incorrecta2": "El triangulo equilatero y el triangulo isoseles",
+        "incorrecta3": "El cono y la esfera\r"
+    },
+    {
+        "categoria": "Matemática",
+        "pregunta": "¿Cuál es la afirmacion verdadera?",
+        "respuesta": "Todo paralelogramo tiene cuatro vértices y cuatro lados ",
+        "incorrecta1": "os lados opuestos de un paralelogramo no son paralelos",
+        "incorrecta2": "La suma de los ángulos interiores de todo paralelogramo es siempre igual a 180°.",
+        "incorrecta3": "Todos los paralelogramos son concavos.\r"
+    },
+    {
+        "categoria": "Matemática",
+        "pregunta": "Raiz Cuadrada de 2",
+        "respuesta": "1,41421356237309504880168872420969807856967187…",
+        "incorrecta1": "3.14159265358979323846264338327950288419716939...",
+        "incorrecta2": "1.73205080756887729352744634150587236694280525…",
+        "incorrecta3": "2.23606797749978969640917366873127623544061835...\r"
+    },
+    {
+        "categoria": "Matemática",
+        "pregunta": "π (Pi)",
+        "respuesta": "3.14159265358979323846264338327950288419716939...",
+        "incorrecta1": "1,41421356237309504880168872420969807856967187…",
+        "incorrecta2": "1.73205080756887729352744634150587236694280525…",
+        "incorrecta3": "2.23606797749978969640917366873127623544061835...\r"
+    },
+    {
+        "categoria": "Matemática",
+        "pregunta": "Raiz Cuadrada de 3",
+        "respuesta": "1.73205080756887729352744634150587236694280525…",
+        "incorrecta1": "1,41421356237309504880168872420969807856967187…",
+        "incorrecta2": "3.14159265358979323846264338327950288419716939...",
+        "incorrecta3": "2.23606797749978969640917366873127623544061835...\r"
+    },
+    {
+        "categoria": "Matemática",
+        "pregunta": "Raiz cuadrada de 5",
+        "respuesta": "2.23606797749978969640917366873127623544061835...",
+        "incorrecta1": "1,41421356237309504880168872420969807856967187…",
+        "incorrecta2": "3.14159265358979323846264338327950288419716939...",
+        "incorrecta3": "1.73205080756887729352744634150587236694280525…\r"
+    },
+    {
+        "categoria": "Matemática",
+        "pregunta": "φ (Phi)",
+        "respuesta": "1,6180339887498948482…",
+        "incorrecta1": "1,4142135623730950488…",
+        "incorrecta2": "3.1415926535897932384...",
+        "incorrecta3": "2.2360679774997896964...\r"
+    },
+  
+    {
+        "categoria": "Matemática",
+        "pregunta": "El número de Arquímedes",
+        "respuesta": "Ar",
+        "incorrecta1": "π",
+        "incorrecta2": "e",
+        "incorrecta3": "0\r"
+    },
+    {
+        "categoria": "Matemática",
+        "pregunta": "la constante de Arquímedes",
+        "respuesta": "π",
+        "incorrecta1": "Ar",
+        "incorrecta2": "senΘ",
+        "incorrecta3": "cosΘ\r"
+    },
+    {
+        "categoria": "Matemática",
+        "pregunta": "Plantea el nombre y símbolo de este número π",
+        "respuesta": "Jones",
+        "incorrecta1": "Euler",
+        "incorrecta2": "Arquímedes",
+        "incorrecta3": "Ahmes\r"
+    },
+    {
+        "categoria": "Matemática",
+        "pregunta": "Con que aproximacion Arquimedes calculo a  π",
+        "respuesta": "3(10/71) < π < 3(1/7)",
+        "incorrecta1": " π = 22/3",
+        "incorrecta2": "3 < π <3.2",
+        "incorrecta3": " π = 3.1\r"
+    },
+  
+   
+    {
+        "categoria": "Matemática",
+        "pregunta": "El día pi en el que los fans de este número lo celebran con diferentes actuaciones. ",
+        "respuesta": "El 14 de marzo",
+        "incorrecta1": "El día 22 de julio",
+        "incorrecta2": "El 24 de Diciembre",
+        "incorrecta3": "Ninguna es correcta\r"
+    },
+    {
+        "categoria": "Matemática",
+        "pregunta": "Simulacion casi perfecta de π (Pi)",
+        "respuesta": "355/113",
+        "incorrecta1": "22/3",
+        "incorrecta2": "Raíz de 9,6",
+        "incorrecta3": "Ninguna es correcta\r"
+    },
+  
+    {
+        "categoria": "Matemática",
+        "pregunta": "La probabilidad de que dos enteros positivos escogidos al azar sean primos entre si es…",
+        "respuesta": "6/(π²)",
+        "incorrecta1": "12 arctan(1/49) + 32 arctan(1/57) - 5 arctan(1/239)",
+        "incorrecta2": "1/2+1/3+1/5+1/7+….",
+        "incorrecta3": "ƒ(x) = 2x^e-1\r"
+    },
+   
+    {
+        "categoria": "Matemática",
+        "pregunta": "Existen programas en internet que buscan tu número de teléfono en las 50.000.000 primeras cifras de…",
+        "respuesta": "3.1415926535897932384… π (Pi)",
+        "incorrecta1": "1,6180339887498948482… φ (Phi)",
+        "incorrecta2": "1.7320508075688772935… √(3)",
+        "incorrecta3": "2.2360679774997896964… √(5)\r"
+    }, 
+  
+    {
+        "categoria": "Matemática",
+        "pregunta": "En que país el número telefónico móvil para emergencias en estaciones de trenes y subterráneos es ∗31416. π (Pi)",
+        "respuesta": "Argentina",
+        "incorrecta1": "Chile",
+        "incorrecta2": "Japón",
+        "incorrecta3": "Colombia\r"
+    },
+   
+    {
+        "categoria": "Matemática",
+        "pregunta": "¿La siguiente expresión de fracciones continuas a que resultado tienden?",
+        "respuesta": "1,6180339887498948482… φ (Phi)",
+        "incorrecta1": "1,4142135623730950488… √(2)",
+        "incorrecta2": "3.1415926535897932384… π (Pi)",
+        "incorrecta3": "2.2360679774997896964… √(5)\r"
+    },
+    {
+        "categoria": "Matemática",
+        "pregunta": "¿La siguiente expresión de fracciones continuas a que resultado tienden?",
+        "respuesta": "1,6180339887498948482… φ (Phi)",
+        "incorrecta1": "1,4142135623730950488… √(2)",
+        "incorrecta2": "3.1415926535897932384… π (Pi)",
+        "incorrecta3": "2.2360679774997896964… √(5)\r"
+    },
+    {
+        "categoria": "Matemática",
+        "pregunta": "Calcula a estos cuatro nueves (9×9+9)/9",
+        "respuesta": "10",
+        "incorrecta1": "9",
+        "incorrecta2": "8",
+        "incorrecta3": "7\r"
+    },
+    {
+        "categoria": "Matemática",
+        "pregunta": "Calcula a estos cuatro nueves (99-9)/9",
+        "respuesta": "10",
+        "incorrecta1": "9",
+        "incorrecta2": "8",
+        "incorrecta3": "7\r"
+    },
+    {
+        "categoria": "Matemática",
+        "pregunta": "Calcula a estas cinco cifras iguales 33×3+(3/3)",
+        "respuesta": "100",
+        "incorrecta1": "333",
+        "incorrecta2": "11",
+        "incorrecta3": "5\r"
+    },
+    {
+        "categoria": "Matemática",
+        "pregunta": "Calcula a estos tres treses 33-3",
+        "respuesta": "30",
+        "incorrecta1": "31",
+        "incorrecta2": "29",
+        "incorrecta3": "28\r"
+    },
+    {
+        "categoria": "Matemática",
+        "pregunta": "Calcula a estos tres seis (6×6)-6",
+        "respuesta": "30",
+        "incorrecta1": "31",
+        "incorrecta2": "29",
+        "incorrecta3": "28\r"
+    },
+    {
+        "categoria": "Matemática",
+        "pregunta": "Calcula a estos tres cincos (5×5)+5",
+        "respuesta": "30",
+        "incorrecta1": "31",
+        "incorrecta2": "29",
+        "incorrecta3": "28\r"
+    },
+    {
+        "categoria": "Matemática",
+        "pregunta": "Forma correcta de escribir al 10 con cuatro nueves",
+        "respuesta": "(9x9+9)/9 ",
+        "incorrecta1": "9+9+9+9",
+        "incorrecta2": "9-9+(9x9)",
+        "incorrecta3": "(9x9)/(9x9)\r"
+    },
+    {
+        "categoria": "Matemática",
+        "pregunta": "Forma correcta de escribir al 10 con cuatro nueves",
+        "respuesta": "(99-9)/9",
+        "incorrecta1": "9+9+9+10",
+        "incorrecta2": "9-9+(9x9)",
+        "incorrecta3": "(9x9)/(9x9)\r"
+    },
+    {
+        "categoria": "Matemática",
+        "pregunta": "Forma correcta de escribir al 100 con cinco cifras iguales",
+        "respuesta": "111-11",
+        "incorrecta1": "55+55*5",
+        "incorrecta2": "22*2*2+2",
+        "incorrecta3": "33x3x(3/3)\r"
+    },
+    {
+        "categoria": "Matemática",
+        "pregunta": "Forma correcta de escribir al 100 con cinco cifras iguales",
+        "respuesta": "33 x 3 + (3/3) ",
+        "incorrecta1": "55 + 55 x 5",
+        "incorrecta2": "22 x 2 x 2 x 2",
+        "incorrecta3": "33 x 3 x (3/3)\r"
+    },
+    {
+        "categoria": "Matemática",
+        "pregunta": "Forma correcta de escribir al 12 con cinco cifras iguales",
+        "respuesta": "((44-4)/4) + √(4)",
+        "incorrecta1": "(√(2)^2) x 2 x 2 x 2",
+        "incorrecta2": "√(4) x ((44 - 4)/4)",
+        "incorrecta3": "(6 x 6) - 6 - (6/6)\r"
+    },
+    {
+        "categoria": "Matemática",
+        "pregunta": "Forma correcta de escribir al 20 con cinco cifras iguales",
+        "respuesta": "√(4) x ((44 - 4)/4)",
+        "incorrecta1": "(√(4) + 4 x 4) + 4",
+        "incorrecta2": "5 + 5 + 5 + 5 + 5",
+        "incorrecta3": "(6 x 6) - 6 - (6/6)\r"
+    },
+    {
+        "categoria": "Matemática",
+        "pregunta": "Se expresa a 36 como producto de tres números naturales y la suma de estos tres da 38 ¿Qué numeros son?",
+        "respuesta": "1, 1 y 36",
+        "incorrecta1": "1, 3 y 12",
+        "incorrecta2": "19, 10 y 9",
+        "incorrecta3": "8, 11 y 19\r"
+    },
+    {
+        "categoria": "Matemática",
+        "pregunta": "Se expresa a 36 como producto de tres números naturales y la suma de estos tres da 16 ¿Qué numeros son?",
+        "respuesta": "1,3 y 12",
+        "incorrecta1": "1, 3 y 13",
+        "incorrecta2": "19, 10 y 9",
+        "incorrecta3": "8, 11 y 19\r"
+    },
+    {
+        "categoria": "Matemática",
+        "pregunta": "Se expresa a 36 como producto de tres números naturales y la suma de estos tres da 13 ¿Qué numeros son?",
+        "respuesta": "1,6 y 6",
+        "incorrecta1": "9,1 y 1",
+        "incorrecta2": "2,3 y 6",
+        "incorrecta3": "4,6 y 1\r"
+    },
+    {
+        "categoria": "Matemática",
+        "pregunta": "Se expresa a 36 como producto de tres números naturales y la suma de estos tres da 11 ¿Qué numeros son?",
+        "respuesta": "2,3 y 6",
+        "incorrecta1": "10,2 y 1",
+        "incorrecta2": "2,3 y 6",
+        "incorrecta3": "4,6 y 1\r"
+    },
+    {
+        "categoria": "Matemática",
+        "pregunta": "Se expresa a 36 como producto de tres números naturales y la suma de estos tres da 21 ¿Qué numeros son?",
+        "respuesta": "1,2 y 18",
+        "incorrecta1": "10,10 y 1",
+        "incorrecta2": "2,3 y 6",
+        "incorrecta3": "4,6 y 1\r"
+    },
+    {
+        "categoria": "Matemática",
+        "pregunta": "Se expresa a 36 como producto de tres números naturales y la suma de estos tres da 14 ¿Qué numeros son?",
+        "respuesta": "1,4 y 9 ",
+        "incorrecta1": "10,2 y 1",
+        "incorrecta2": "7,6 y 1",
+        "incorrecta3": "4,6 y 1\r"
+    },
+    {
+        "categoria": "Matemática",
+        "pregunta": "Se expresa a 36 como producto de tres números naturales y la suma de estos tres da 13 ¿Qué numeros son?",
+        "respuesta": "2,2 y 9",
+        "incorrecta1": "10,2 y 1",
+        "incorrecta2": "2,3 y 6",
+        "incorrecta3": "4,6 y 1\r"
+    },
+    {
+        "categoria": "Matemática",
+        "pregunta": "Se expresa a 36 como producto de tres números naturales y la suma de estos tres da 10 ¿Qué numeros son?",
+        "respuesta": "3,3 y 4",
+        "incorrecta1": "1, 3 y 12",
+        "incorrecta2": "19, 10 y 9",
+        "incorrecta3": "8, 11 y 19\r"
+    },
+    {
+        "categoria": "Matemática",
+        "pregunta": "Calcula 4+5+6+7+8=9+10+11",
+        "respuesta": "30",
+        "incorrecta1": "20",
+        "incorrecta2": "100",
+        "incorrecta3": "31\r"
+    },
+    {
+        "categoria": "Matemática",
+        "pregunta": "Los numeros que pueden escribirse como la razon de dos enteros se denominan... ",
+        "respuesta": "Racionales",
+        "incorrecta1": "Enteros",
+        "incorrecta2": "Imaginarios",
+        "incorrecta3": "Compuestos\r"
+    },
+    {
+        "categoria": "Matemática",
+        "pregunta": "Entre dos numeros reales siempre existira otro numero real ¿Qué significa esto?",
+        "respuesta": "Que los numeros son infinitos",
+        "incorrecta1": "Que hay un error en las matematicas",
+        "incorrecta2": "Nadie sabe que significa (es un misterio)",
+        "incorrecta3": "Que por mucho que corramos nunca alcanzaremos la meta\r"
+    },
+    {
+        "categoria": "Matemática",
+        "pregunta": "Raiz Cuadrada de 7",
+        "respuesta": "2,64575131106459…",
+        "incorrecta1": "1,41421356237309…",
+        "incorrecta2": "3.14159265358979...",
+        "incorrecta3": "2.23606797749978...\r"
+    },
+    {
+        "categoria": "Matemática",
+        "pregunta": "Raiz cuadrada de 11",
+        "respuesta": "3,3166247903554...",
+        "incorrecta1": "1,4142135623730…",
+        "incorrecta2": "3.141592653589...",
+        "incorrecta3": "1.732050807568…\r"
+    },
+    {
+        "categoria": "Matemática",
+        "pregunta": "¿Dos ruedas están unidas por una correa transmisora. La primera tiene un radio de 25 cm y la segunda de 75 cm. Cuando la primera ha dado 300 vueltas, ¿cuántas vueltas habrá dado la segunda?",
+        "respuesta": "100",
+        "incorrecta1": "1000",
+        "incorrecta2": "18",
+        "incorrecta3": "49\r"
+    },
+    {
+        "categoria": "Matemática",
+        "pregunta": "¿Seis personas pueden vivir en un hotel durante 12 días por $792.000. ¿Cuánto costará el hotel de 15 personas durante ocho días?",
+        "respuesta": "$1.320.000",
+        "incorrecta1": "$15.000.000",
+        "incorrecta2": "$1.203.000",
+        "incorrecta3": "$8.927.000\r"
+    },
+    {
+        "categoria": "Matemática",
+        "pregunta": "Con 12 botes conteniendo cada uno ½ kg de pintura se han pintado 90 m de verja de 80 cm de altura. Calcular cuántos botes de 2 kg de pintura serán necesarios para pintar una verja similar de 120 cm de altura y 200 metros de longitud.",
+        "respuesta": "10",
+        "incorrecta1": "5",
+        "incorrecta2": "19",
+        "incorrecta3": "11\r"
+    },
+    {
+        "categoria": "Matemática",
+        "pregunta": "11 obreros labran un campo rectangular de 220 m de largo y 48 de ancho en 6 días. ¿Cuántos obreros serán necesarios para labrar otro campo análogo de 300 m de largo por 56 m de ancho en cinco días?",
+        "respuesta": "21",
+        "incorrecta1": "22",
+        "incorrecta2": "20",
+        "incorrecta3": "19\r"
+    },
+    {
+        "categoria": "Matemática",
+        "pregunta": "a cuanto equivale ½ de hora en minutos",
+        "respuesta": "30",
+        "incorrecta1": "15",
+        "incorrecta2": "45",
+        "incorrecta3": "60\r"
+    },
+    {
+        "categoria": "Matemática",
+        "pregunta": "Fraccion equivalente a 4/3",
+        "respuesta": "12/9",
+        "incorrecta1": "15/21",
+        "incorrecta2": "2/3",
+        "incorrecta3": "16/6\r"
+    },
+    {
+        "categoria": "Matemática",
+        "pregunta": "La hipotenusa es igual a la raiz de la suma de los catetos al cuadrado",
+        "respuesta": "Teorema de pitagoras",
+        "incorrecta1": "Teorema de Tales",
+        "incorrecta2": "Es incorrecto",
+        "incorrecta3": "Teorema del triangulin\r"
+    },
+  
+    {
+        "categoria": "Matemática",
+        "pregunta": "la circunferencia de un círculo mantiene la misma relación respecto de su diámetro que la superficie del círculo respecto del cuadrado del radio.",
+        "respuesta": "π",
+        "incorrecta1": "Esa afirmacion es errada",
+        "incorrecta2": "Es una constante que equivale a 22/7",
+        "incorrecta3": "en el 2001 se encontro que equivale exactamente a 355/113\r"
+    },
+    {
+        "categoria": "Matemática",
+        "pregunta": "El nombre algebra tiene origen por",
+        "respuesta": "Al-Juarismi",
+        "incorrecta1": "Brahmagupta",
+        "incorrecta2": "Abu'l Wafa",
+        "incorrecta3": "Al-Battani\r"
+    }
+
+ ]
+
+
+
+  return texto;
+}
+
+function readText2(ruta_local) {
+  var texto = null;
+  var xmlhttp = new XMLHttpRequest();
+  xmlhttp.open("GET", ruta_local, false);
+  xmlhttp.send();
+  if (xmlhttp.status == 200) {
+    texto = xmlhttp.responseText;
+  }
+
+  return texto;
+}
